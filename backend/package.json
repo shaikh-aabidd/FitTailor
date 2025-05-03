@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js",
     "test": "cross-env NODE_ENV=test jest --detectOpenHandles --forceExit",
-    "test:watch": "npm test -- --watch"
+    "test:watch": "npm test -- --watch",
+    "start": "cross-env NODE_ENV=production node -r dotenv/config src/index.js"
   },
   "keywords": [],
   "author": "Aabid",

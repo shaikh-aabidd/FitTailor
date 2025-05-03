@@ -162,7 +162,6 @@ const app = express();
 
 // app.get('/favicon.ico', (req, res) => res.status(204).end()); //to handle favicon error
 
-
 // 1. Global Middlewares ============================
 
 /// 1. Rate Limiting ===========
@@ -194,7 +193,6 @@ const limiter = rateLimit({
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
   }));
-
 
 // Body parsers
 app.use(express.json({ limit: "16kb" }));
