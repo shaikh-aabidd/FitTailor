@@ -20,7 +20,7 @@ import InfoSection from "./InfoSection";
 import StepsList from "./StepsList";
 import ProductGrid from "./ProductGrid";
 import TestimonialCarousel from "./TestimonialCarousel";
-import NewsLetterSignup from "./NewsLetterSignUp";
+import NewsLetterSignup from "./NewsLetterSignup";
 import Measurement from "./Measurement";
 import Checkout from "./Checkout";
 import MeasurementCard from "./MeasurementCard";
