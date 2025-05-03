@@ -1,5 +1,5 @@
 import ErrorBoundary from "./ErrorBoundary";
-import ListProduct from "./listProduct";
+import ListProduct from "./ListProduct";
 import Loader from "./Loader";
 import ProductCard from "./ProductCard";
 import NotFound from "./404";
