@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const NewsletterSignup = () => {
+const NewsLetterSignup = () => {
   const [email, setEmail] = useState('');
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -31,4 +31,4 @@ const NewsletterSignup = () => {
     </section>
 );
 }
-export default NewsletterSignup;
+export default NewsLetterSignup;

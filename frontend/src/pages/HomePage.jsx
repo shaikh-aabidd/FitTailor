@@ -7,7 +7,7 @@ import {
   StepsList,
   ProductGrid,
   TestimonialCarousel,
-  NewsletterSignup
+  NewsLetterSignup
 } from "../components"
 
 import { useGetAllProductsQuery } from '../features/api/product.api';
@@ -24,7 +24,7 @@ const HomePage = () => {
         <StepsList />
         <ProductGrid products={products} />
         <TestimonialCarousel />
-        <NewsletterSignup />
+        <NewsLetterSignup />
      </>
   );
 };
