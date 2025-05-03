@@ -1,0 +1,35 @@
+frontend/
+├── public/
+│   └── images/          # Static assets
+│
+├── src/
+│   ├── components/      # Reusable UI components
+│   │   ├── common/      # (Buttons, Inputs, Loaders)
+│   │   ├── product/     # (ProductCard, PriceDisplay)
+│   │   └── tailoring/   # (MeasurementForm, FabricSelector)
+│   │
+│   ├── features/        # Redux slices and async logic
+│   │   ├── auth/
+│   │   ├── cart/
+│   │   └── products/
+│   │
+│   ├── hooks/           # Custom hooks
+│   ├── pages/           # Page components
+│   │   ├── Home/
+│   │   ├── Product/
+│   │   ├── Cart/
+│   │   └── .../
+│   │
+│   ├── services/        # API service layer
+│   ├── utils/           # Helpers, validators, formatters
+│   ├── assets/          # CSS, fonts, dynamic images
+│   ├── App.jsx
+│   ├── main.jsx
+│   └── index.css
+│
+├── tailwind.config.js
+├── postcss.config.js
+└── vite.config.js
+
+
+
