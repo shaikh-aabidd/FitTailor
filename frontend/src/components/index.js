@@ -20,7 +20,7 @@ import InfoSection from "./InfoSection";
 import StepsList from "./StepsList";
 import ProductGrid from "./ProductGrid";
 import TestimonialCarousel from "./TestimonialCarousel";
-import NewsletterSignup from "./NewsLetterSignUp";
+import NewsLetterSignup from "./NewsLetterSignUp";
 import Measurement from "./Measurement";
 import Checkout from "./Checkout";
 import MeasurementCard from "./MeasurementCard";
@@ -32,5 +32,5 @@ import Step4Tailor from "./Step4";
 import Step5ReviewAddOns from "./Step5";
 
 export {ListProduct,Loader,ProductCard,ErrorBoundary,NotFound,Button,LogoutButton,Input,Signup,Login,
-    ProductListing,CartList,Profile,Header,ProductDetails,HeroBanner,CategoryCard,CategoryScroller,InfoSection,StepsList,ProductGrid,TestimonialCarousel,NewsletterSignup,Measurement,Checkout,MeasurementCard,DeleteMeasurementButton,Step1Garment,Step2StyleFabric,Step3Measurements,Step4Tailor,Step5ReviewAddOns
+    ProductListing,CartList,Profile,Header,ProductDetails,HeroBanner,CategoryCard,CategoryScroller,InfoSection,StepsList,ProductGrid,TestimonialCarousel,NewsLetterSignup,Measurement,Checkout,MeasurementCard,DeleteMeasurementButton,Step1Garment,Step2StyleFabric,Step3Measurements,Step4Tailor,Step5ReviewAddOns
 }
