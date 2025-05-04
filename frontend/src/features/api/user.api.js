@@ -76,7 +76,10 @@ export const userApi = apiSlice.injectEndpoints({
     }),
     getAllUsers: builder.query({
       query: () => '/users/get-all-users',
-      providesTags: ['User'],
+      providesTags: (result = [], error) => [
+        { type: 'User', id: 'LIST' },
+        ...result.data.map(u => ({ type: 'User', id: u._id })),
+      ],
     }),
     updateUserRole: builder.mutation({
       query: ({ userId, role }) => ({
@@ -84,7 +87,10 @@ export const userApi = apiSlice.injectEndpoints({
         method: 'PATCH',
         body: { role },
       }),
-      invalidatesTags: ['User'],
+      invalidatesTags: (result, error, { userId }) => [
+        { type: 'User', id: 'LIST' },     // tells RTKQ to refetch the full list
+        { type: 'User', id: userId },     // tells RTKQ to refetch this specific user
+      ],
     }),
   }),
 });

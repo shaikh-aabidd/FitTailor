@@ -109,7 +109,7 @@ export default createBrowserRouter(
       <Route
         path="/AdminUserRolePage"
         element={
-          <AuthLayout authentication={true}>
+          <AuthLayout authentication={true} roles={"admin"}>
             <AdminUserRolePage />
           </AuthLayout>
         }
