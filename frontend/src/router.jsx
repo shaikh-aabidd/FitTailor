@@ -127,7 +127,7 @@ export default createBrowserRouter(
       <Route
         path="customize"
         element={
-          <AuthLayout authentication={true} roles={"admin"}>
+          <AuthLayout authentication={true}>
             <CustomizationPage />
           </AuthLayout>
         }
