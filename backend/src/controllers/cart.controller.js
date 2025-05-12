@@ -123,7 +123,7 @@ const getCartItems = asyncHandler(async (req, res) => {
           "Cart items retrieved successfully"
         )
       );
-  });
+});
 
 // Delete from Cart Controller
 const removeFromCart = asyncHandler(async (req, res) => {
@@ -175,7 +175,7 @@ const updateCartItem = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const { productId } = req.params;
   const { quantity } = req.body;
-
+  console.log("Quantity",quantity)
   // Validate inputs
   if (!mongoose.Types.ObjectId.isValid(productId)) {
     throw new ApiError(400, "Invalid product ID");

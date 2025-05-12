@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useNavigate, Outlet, useLocation } from 'react-router-dom';
 
 const steps = [
@@ -7,18 +8,22 @@ const steps = [
   { id: 3, title: 'Measurements', path: '/customize/step3' },
   { id: 4, title: 'Tailor Selection', path: '/customize/step4' },
   { id: 5, title: 'Review & Add‑Ons', path: '/customize/step5' },
-  { id: 6, title: 'Checkout', path: '/customize/step6' },
+  { id: 6, title: 'Checkout', path: '/checkout' },
 ];
 
 export default function CustomizationPage() {
   const navigate = useNavigate();
-  const location = useLocation();
+  const location = useLocation(); 
   const [currentStep, setCurrentStep] = useState(0);
+  const customization = useSelector(state => state.customization)
+  console.log(customization.currentStep)
 
   const isAtIndex = location.pathname === '/customize';
 
   const startWizard = () => {
+    if(currentStep == 0){
     setCurrentStep(1);
+    }
     navigate(steps[0].path);
   };
 
@@ -29,6 +34,10 @@ export default function CustomizationPage() {
       navigate(step.path);
     }
   };
+
+  useEffect(()=>{
+    setCurrentStep(customization.currentStep)
+  })
 
   return (
     <div className="min-h-screen p-6">

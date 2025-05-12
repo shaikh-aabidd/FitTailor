@@ -3,9 +3,9 @@ import { apiSlice } from "./apiSlice";
 export const productApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getAllProducts: builder.query({
-      query: ({ page = 1, limit = 12 }) => ({
+      query: ({ page = 1, limit = 12,category,fabricType }) => ({
         url: '/products',
-        params: { page, limit },
+        params: { page, limit,category,fabricType },
       }),
       transformResponse: (response) => response.data,   // if you wrap data
       providesTags: (result, error) =>

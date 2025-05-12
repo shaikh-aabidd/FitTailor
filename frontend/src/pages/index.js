@@ -9,7 +9,8 @@ import MeasurementPage from "./MeasurementPage";
 import CheckoutPage from "./CheckoutPage";
 import CustomizationPage from "./CustomizationPage";
 import OrderTrackingPage from "./OrderTrackingPage";
+import ViewDetailsPage from "./ViewDetailsPage";
 
 export {SignupPage,LoginPage,ProductsPage,CartPage,ProfilePage,ProductDetailsPage,HomePage,MeasurementPage,
-    CheckoutPage,CustomizationPage,OrderTrackingPage
+    CheckoutPage,CustomizationPage,OrderTrackingPage,ViewDetailsPage
 };

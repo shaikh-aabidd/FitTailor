@@ -2,12 +2,13 @@
 // components/customization/Step1Garment.jsx
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   setGarment,
   completeStep,
   setCurrentStep,
 } from '../features/CustomizationSlice';
+import Button from './Button';
 
 const garments = [
   { id: 'shirt', label: 'Shirt', imageUrl: '/images/shirt3.jpg' },
@@ -30,6 +31,7 @@ export default function Step1Garment() {
 
   return (
     <div className="p-6">
+      <Link to="/customize"><Button>⬅ Steps page</Button></Link>
       <h2 className="text-2xl font-bold mb-4">Step 1: Choose Your Garment</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 ">
         {garments.map((g) => {

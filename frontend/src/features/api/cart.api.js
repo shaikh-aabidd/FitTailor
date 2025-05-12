@@ -9,7 +9,7 @@ export const cartApi = apiSlice.injectEndpoints({
           url: '/cart',
           method: 'POST',
           body: { productId }
-        }),
+        }), 
         transformResponse: (response) => response.data,
         invalidatesTags: ['Cart','User']
       }),
@@ -17,7 +17,10 @@ export const cartApi = apiSlice.injectEndpoints({
       // Get Cart Items
       getCartItems: builder.query({
         query: () => '/cart',
-        providesTags: ['Cart'],
+        providesTags: (result) =>
+          result
+            ? [{ type: 'Cart', id: 'LIST' }]
+            : [{ type: 'Cart', id: 'LIST' }],
       }),
       
       // Update Quantity
@@ -27,7 +30,7 @@ export const cartApi = apiSlice.injectEndpoints({
           method: 'PATCH',
           body: { quantity },
         }),
-        invalidatesTags: ['Cart'],
+        invalidatesTags: ['Cart','CurrentUser'],
       }),
 
       //clear cart

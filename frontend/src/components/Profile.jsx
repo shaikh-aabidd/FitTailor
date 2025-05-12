@@ -7,17 +7,23 @@ import Button from "./Button";
 import { useSelector } from "react-redux";
 import DeleteMeasurementButton from "./DeleteMeasurement";
 import { useGetAllMeasurementsQuery } from "../features/api/measurement.api";
+import { useGetCartItemsQuery } from "../features/api/cart.api";
 
 function Profile() {
   const { user, isAuthenticated } = useSelector((s) => s.auth);
-
+  const { data: cartItems = [], isLoading: cartLoading } = useGetCartItemsQuery();
   const {data:measurements} = useGetAllMeasurementsQuery();
+
+  console.log("Measurements",measurements)
   // If we’re still loading auth, or no user yet, show a loader
   if (!isAuthenticated) {
     return <Loader fullScreen />;
   }
   if (!user) {
     return <p className="text-center py-8">No profile data.</p>;
+  }
+  if(cartLoading){  
+    return <Loader />
   }
 
   const {
@@ -33,7 +39,9 @@ function Profile() {
     updatedAt,
   } = user;
 
-  console.log(measurementProfiles)
+
+
+  console.log("user",user)
 
   const formatDate = (iso) =>
     new Date(iso).toLocaleDateString("en-US", {
@@ -41,6 +49,7 @@ function Profile() {
       month: "short",
       day: "numeric",
     });
+
   return (
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-3xl font-bold text-gray-900 mb-6">My Profile</h1>
@@ -74,10 +83,10 @@ function Profile() {
           </p>
           <p>
             <span className="font-medium">Measurement Profiles:</span>{" "}
-            {measurementProfiles.length}
+            {measurements?.data?.length}
           </p>
           <p>
-            <span className="font-medium">Items in Cart:</span> {cart.length}
+            <span className="font-medium">Items in Cart:</span> {cartItems.data?.length}
           </p>
           <p className="mt-2 text-sm text-gray-500">
             Last updated {formatDate(updatedAt)}
@@ -126,7 +135,7 @@ function Profile() {
         <h2 className="text-2xl font-semibold text-gray-900 mb-4">
           Measurement Profiles
         </h2>
-        {measurementProfiles.length === 0 ? (
+        {measurements?.data?.length === 0 ? (
           <p className="text-gray-600">No measurement profiles created yet.</p>
         ) : (
           <ul className="space-y-2">

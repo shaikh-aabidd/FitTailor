@@ -78,7 +78,6 @@ const createProduct = asyncHandler(async (req, res) => {
 // Get All Products
 const getAllProducts = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10, category, fabricType } = req.query;
-
   const filter = {};
 
   // 1. Exclude “custom” products by default

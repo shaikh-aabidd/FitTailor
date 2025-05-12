@@ -118,18 +118,19 @@ const getAllMeasurements = async (req, res) => {
 const deleteMeasurement = asyncHandler(async (req, res) => {
     const { measurementId } = req.params;
     
-    // Check for orders using this measurement
-    const orderExists = await Order.exists({ 
-        measurements: new mongoose.Types.ObjectId(measurementId) 
+    // Find any active orders (non-cancelled) using this measurement
+    const activeOrderExists = await Order.exists({ 
+        measurements: new mongoose.Types.ObjectId(measurementId),
+        status: { $ne: "cancelled" } // Exclude cancelled orders
     });
     
-    if (orderExists) {
-        throw new ApiError(400, "Measurement is used in active orders");
+    if (activeOrderExists) {
+        throw new ApiError(400, "Measurement is used in active orders and cannot be deleted");
     }
     
     const measurement = await Measurement.findOneAndDelete({
         _id: measurementId,
-        user: req.user._id  // You can remove mongoose.Types.ObjectId wrapper here if req.user._id is already an ObjectId or a valid string.
+        user: req.user._id
     });
     
     if (!measurement) {
@@ -138,9 +139,8 @@ const deleteMeasurement = asyncHandler(async (req, res) => {
     
     return res
       .status(200)
-      .json(new ApiResponse(200, {}, "Measurement deleted"));
+      .json(new ApiResponse(200, {}, "Measurement deleted successfully"));
 });
-
 
 export {
     addMeasurement,

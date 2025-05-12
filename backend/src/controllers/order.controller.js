@@ -13,7 +13,8 @@ const createOrder = asyncHandler(async (req, res) => {
         designChoices = {},            // default to empty object
         deliveryAddress,
         tailorNotes = "",
-        quantity=1
+        quantity=1,
+        totalAmount
       } = req.body;
 
       console.log("🛠  createOrder payload:", req.body);
@@ -47,7 +48,7 @@ const createOrder = asyncHandler(async (req, res) => {
         deliveryAddress,
         tailorNotes,
         quantity,
-        totalAmount: product.price * quantity,
+        totalAmount: totalAmount ||product.price * quantity,
         status: 'placed',
       };
       
@@ -69,7 +70,11 @@ const createOrder = asyncHandler(async (req, res) => {
 
     // Create order
     const order = await Order.create(orderData);
-
+    await User.findByIdAndUpdate(
+      req.user._id,
+      { $push: { orders: order._id } },
+      { new: true }    // optional: return the updated user document
+    );
     // Update product stock
     product.stock -= 1;
     await product.save({ validateBeforeSave: false });

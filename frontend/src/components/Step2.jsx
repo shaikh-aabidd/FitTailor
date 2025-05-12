@@ -6,10 +6,11 @@ import {
   setCurrentStep,
   setNewProductId,
 } from '../features/CustomizationSlice';
-import { data, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { data, Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { useCreateCustomProductMutation, useGetAllProductsQuery, useGetProductByIdQuery } from '../features/api/product.api';
 import { toast } from 'react-toastify'
+import Button from './Button';
 
 const collarOptions = [
   { label: 'Classic', value: 'classic', image: '/images/classicCollar.png' },
@@ -30,24 +31,27 @@ export default function Step2StyleFabric() {
   const { designChoices, fabric } = useSelector((state) => state.customization);
   const [createCustomProduct, { isLoading: isCreating }] = useCreateCustomProductMutation();
 
+  const selectedfabric = useSelector(s=>s.customization.fabric)
+  console.log("kkkkk",selectedfabric)
+
   const [collar, setCollar] = useState(designChoices.collar);
   const [sleeves, setSleeves] = useState(designChoices.sleeves);
   const [selectedFabric, setSelectedFabric] = useState(fabric);
   const [selectedFabrics, setSelectedFabrics] = useState([]);
 
   const { data: fabricOptions = [], isLoading } = useGetAllProductsQuery({
-    category: 'unstiched',
-    fabricType: selectedFabrics,
     limit: 12,
-    page: 1
+    page: 1,
+    category: 'unstiched',
+    fabricType: selectedFabrics
   });
 
   // console.log("DATA",fabricOptions)
-  console.log("Selected fabrics",selectedFabric)
+  // console.log("Selected fabrics",selectedFabric)
 
   const { data: fab } = useGetProductByIdQuery(selectedFabric, { skip: !selectedFabric })
 
-  console.log("Selected fabrics",fab)
+  // console.log("Selected fabrics",fab)
 
   // helper: price = fabric.price + 300 (collar) + 300 (sleeves)
   const calculatePrice = () => {
@@ -90,6 +94,12 @@ export default function Step2StyleFabric() {
     );
   };
 
+  useEffect(()=>{
+    if(selectedfabric){
+      setSelectedFabric(selectedfabric)
+    }
+  },[])
+
   const renderSelectionGrid = (options, selected, setSelected, label) => (
     <div className="text-center">
       <h3 className="font-medium mb-4 text-lg">{label}</h3>
@@ -120,6 +130,9 @@ export default function Step2StyleFabric() {
 
   return (
     <div className="p-6">
+      <Link to="/customize/step1"><Button className="mb-1"> ← Previous step</Button></Link>
+      <Link to="/customize"><Button className="mb-3 ml-2"> : Steps Page</Button></Link>
+
       <h2 className="text-2xl font-bold mb-4">Step 2: Pick Your Style & Fabric</h2>
 
       <div className="space-y-6">

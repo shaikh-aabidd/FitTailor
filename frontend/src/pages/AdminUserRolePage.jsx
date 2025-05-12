@@ -4,18 +4,21 @@ import {
   useGetAllUsersQuery, 
   useUpdateUserRoleMutation 
 } from '../features/api/user.api';
-import { useCreateTailorMutation } from '../features/api/tailor.api';
+import { useCreateTailorMutation, useDeleteTailorMutation, useGetAllTailorsQuery } from '../features/api/tailor.api';
 import Loader from '../components/Loader';
 import { toast } from 'react-toastify';
 
 export default function AdminUserRolePage() {
   const { data: usersResp, isLoading } = useGetAllUsersQuery();
+  const {data:tailorResp,isLoading:tailorLoading} = useGetAllTailorsQuery();
+  // console.log("tailorResp :-",tailorResp?.data?.docs)
   const [updateUserRole]   = useUpdateUserRoleMutation();
   const [createTailor]     = useCreateTailorMutation();
+  const [deleteTailor]     = useDeleteTailorMutation();
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredUsers = useMemo(() => {
-    if (!usersResp?.data) return [];
+    if (!usersResp?.data) return [];  
     const term = searchTerm.trim().toLowerCase();
     return usersResp.data.filter(u =>
       u.name.toLowerCase().includes(term) ||
@@ -36,6 +39,7 @@ export default function AdminUserRolePage() {
     const specs = raw.split(',').map(s => s.trim()).filter(Boolean);
     try {
       await createTailor({ userId: user._id, specialization: specs }).unwrap();
+      await updateUserRole({ userId: user._id, role: 'tailor' }).unwrap();
       toast.success(`${user.name} is now a Tailor!`);
       // option: refetch users to pick up new role
     } catch (err) {
@@ -44,7 +48,17 @@ export default function AdminUserRolePage() {
   };
 
   const handleMakeCustomer = async (user) => {
+    // console.log("User ",user);
     try {
+      //issue : we can't change the role of admin to customer
+      const tailor = tailorResp.data?.docs?.find(
+        (tailor) => tailor.user === user._id
+      );
+      console.log("tailorId",tailor)
+      if(tailor){
+        const resp = await deleteTailor(tailor._id);
+        console.log("delete response",resp)
+      }
       await updateUserRole({ userId: user._id, role: 'customer' }).unwrap();
       toast.success(`${user.name} is now a Customer`);
     } catch {

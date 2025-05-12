@@ -53,7 +53,7 @@ export const userApi = apiSlice.injectEndpoints({
 
     getCurrentUser: builder.query({
         query: () => '/users/me',
-        providesTags: ['User'],
+        providesTags: ['User','CurrentUser'],
         // Auto re-fetch when network reconnects
         onCacheEntryAdded: async (args, { updateCachedData, cacheEntryRemoved }) => {
           try {

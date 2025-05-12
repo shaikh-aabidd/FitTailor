@@ -12,6 +12,8 @@ import { useCreateOrderMutation } from "../features/api/order.api";
 import { useGetAllMeasurementsQuery } from "../features/api/measurement.api";
 
 import { setCredentials } from "../features/auth/authSlice";
+import { setCurrentStep } from "../features/CustomizationSlice";
+import { useGetProductByIdQuery } from "../features/api/product.api";
 
 export default function Checkout() {
   const dispatch = useDispatch();
@@ -24,6 +26,12 @@ export default function Checkout() {
   const customization = useSelector((s) => s.customization);
   const customProductId = customization.newProductId;
   const selectedMeasurementId = customization.measurementProfileId;
+
+  const { data: customProductResp } = useGetProductByIdQuery(customProductId, { skip: !customProductId })
+  const customPrice = customProductResp?.data?.price ?? 0
+console.log(user)
+  // console.log("Measurement Data ",customization.measurementData);
+  // console.log("selected fabric Data ",customization.garment);
     
   // --- RTK Query mutations & queries ---
   const [createOrder, { isLoading: creatingOrder }] = useCreateOrderMutation();
@@ -51,7 +59,7 @@ export default function Checkout() {
   });
   useEffect(() => {
     const addr =
-      user.addresses.find((a) => a._id === selectedAddressId) || defaultAddr;
+      user.addresses?.find((a) => a._id === selectedAddressId) || defaultAddr;
     reset({ ...addr, comment: "" });
   }, [selectedAddressId, user.addresses, reset]);
 
@@ -71,50 +79,74 @@ export default function Checkout() {
     (sum, i) => sum + i.product.price * i.quantity,
     0
   );
-  const totalAmount = cartTotal + (customProductId ? customizationPrice : 0);
+  console.log("cart toatl",cartTotal)
+   const totalAmount = cartTotal + (customProductId ? customizationPrice + customPrice : 0);
 
-  // --- On submit ---
+  // --- Updated onSubmit handler ---
   const onSubmit = async ({ street, city, state, zipCode, comment }) => {
-    // Choose the productId: custom first, else first cart item
-    const productId = customProductId || cartItems[0]?.product._id;
-    if (!productId) {
-      return toast.error("No product selected to order");
+    // 1. Prepare all orders to create
+    const ordersToCreate = [];
+
+    // Add orders for cart items
+    cartItems.forEach((cartItem) => {
+      ordersToCreate.push({
+        productId: cartItem.product._id,
+        quantity: cartItem.quantity,
+        deliveryAddress: { street, city, state, zipCode, type: "custom" },
+        paymentMethod,
+        totalAmount: cartItem.product.price * cartItem.quantity,
+        tailorNotes: comment,
+      });
+    });
+
+    // Add custom product order if present
+    if (customProductId) {
+      ordersToCreate.push({
+        productId: customProductId,
+        quantity: 1,
+        measurementId: selectedMeasurementId || null,
+        designChoices: {
+          fabricId: customization.fabric,
+          collarStyle: customization.designChoices.collar,
+          sleeveStyle: customization.designChoices.sleeves,
+          tailorId: customization.tailorInfo._id,
+          addOns: Object.keys(customization.addOns).filter(
+            (k) => customization.addOns[k]
+          ),
+          price: customizationPrice,
+        },
+        deliveryAddress: { street, city, state, zipCode, type: "custom" },
+        paymentMethod,
+        totalAmount: customizationPrice + customPrice,
+        tailorNotes: comment,
+      });
     }
 
-    const payload = {
-      productId,
-      measurementId: selectedMeasurementId || null,
-      designChoices: customProductId
-        ? {
-            fabricId: customization.fabric,
-            collarStyle: customization.designChoices.collar,
-            sleeveStyle: customization.designChoices.sleeves,
-            tailorId: customization.tailorInfo._id,
-            addOns: Object.keys(customization.addOns).filter(
-              (k) => customization.addOns[k]
-            ),
-            price: customizationPrice,
-          }
-        : undefined,
-      deliveryAddress: { street, city, state, zipCode, type: "custom" },
-      quantity: 1,
-      paymentMethod,
-      totalAmount,
-      tailorNotes: comment,
-    };
+    // 2. Validate at least one order
+    if (ordersToCreate.length === 0) {
+      return toast.error("No products to order");
+    }
 
     try {
-      await createOrder(payload).unwrap();
-      toast.success("Order placed successfully!");
-      // clear the cart, then navigate
-      await clearCart().unwrap();
+      // 3. Create all orders in parallel
+      await Promise.all(
+        ordersToCreate.map((payload) => createOrder(payload).unwrap())
+      );
+
+      toast.success(`${ordersToCreate.length} orders placed successfully!`);
+      dispatch(setCurrentStep(1));
+
+      // 4. Clear cart only if there were cart items
+      if (cartItems.length > 0) {
+        await clearCart().unwrap();
+      }
+
       navigate("/orders/track");
     } catch (err) {
       console.error(err);
-      toast.error(err.data?.message || "Order failed"); 
+      toast.error(err.data?.message || "Failed to place some orders");
     }
   };
-
   if (
     authLoading ||
     creatingOrder ||
@@ -198,7 +230,7 @@ export default function Checkout() {
               <h3 className="font-semibold">Custom Garment</h3>
               <div className="flex justify-between">
                 <span>Your custom piece</span>
-                <span>${customizationPrice.toFixed(2)}</span>
+                <span>${(customPrice+customizationPrice).toFixed(2)}</span>
               </div>
             </div>
           )}

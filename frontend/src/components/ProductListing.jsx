@@ -4,7 +4,7 @@ import ProductCard from './ProductCard';
 import Loader from './Loader';
 
 const ProductListing = ({
-  categories = ['Shirt', 'Pants', 'Accessories', 'Tailoring'],
+  categories = ['Shirt', 'Pants', 'Unstiched', 'Suit'],
   fabrics = ['Cotton', 'Silk', 'Wool', 'Linen'],
 }) => {
   const [selectedPrice, setSelectedPrice] = useState(5000);

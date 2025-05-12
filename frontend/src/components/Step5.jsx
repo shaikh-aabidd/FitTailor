@@ -8,8 +8,9 @@ import {
   setTailorInfo,
   setFabric,
 } from '../features/CustomizationSlice';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useGetProductByIdQuery } from '../features/api/product.api';
+import Button from './Button';
 
 
 const Step5ReviewAddOns = () => {
@@ -61,6 +62,8 @@ const Step5ReviewAddOns = () => {
 
   return (
     <div className="space-y-6">
+      <Link to="/customize/step4"><Button className="mb-1"> ← Previous step</Button></Link>
+                  <Link to="/customize"><Button className="mb-3 ml-2"> : Steps Page</Button></Link>
       <h2 className="text-xl font-bold">Review Your Customization</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

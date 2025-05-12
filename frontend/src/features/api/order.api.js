@@ -1,50 +1,70 @@
-import { apiSlice } from "./apiSlice";
+    import { apiSlice } from "./apiSlice";
 
-export const orderApi = apiSlice.injectEndpoints({
-    endpoints:(builder)=>({
-        getAllOrders:builder.query({
-            query:() => '/orders',
-            providesTags:['Order'],
-        }),
+    export const orderApi = apiSlice.injectEndpoints({
+        endpoints:(builder)=>({
+            getAllOrders: builder.query({
+                query: ({ page=1, limit=10, status="" }={}) => ({
+                  url: '/orders',
+                  params: { page, limit, status }
+                }),
+                providesTags: (result) => {
+                  // Handle all possible undefined/null scenarios
+                  if (!result) return [{ type: 'Order', id: 'LIST' }];
+                  
+                  const docs = result.docs || result.data?.docs || [];
+                  
+                  return [
+                    { type: 'Order', id: 'LIST' },
+                    ...docs.map(order => ({ type: 'Order', id: order._id }))
+                  ];
+                }
+              }),
 
-        getOrderById:builder.query({
-            query:(id) => `/orders/${id}`,
-            providesTags:(result,error,{id}) => [{type:'Order',id}]
-        }),
-
-        createOrder:builder.mutation({
-            query:(orderData)=>({
-                url:'/orders',
-                method:'POST',
-                body:orderData,
+            getOrderById:builder.query({
+                query:(id) => `/orders/${id}`,
+                providesTags:(result,error,{id}) => [{type:'Order',id}]
             }),
-            invalidatesTags:['Order']
-        }),
 
-        updateOrderStatus: builder.mutation({
-            query: ({ id, status }) => ({
-              url: `/orders/${id}/status`,
-              method: "PATCH",
-              body: { status }
+            createOrder:builder.mutation({
+                query:(orderData)=>({
+                    url:'/orders',
+                    method:'POST',
+                    body:orderData,
+                }), 
+                invalidatesTags: [
+                    'Order',
+                    'CurrentUser',
+                    { type: 'Cart', id: 'LIST' }
+                ],
             }),
-            invalidatesTags: ['Order']
-          }),          
 
-        deleteOrder:builder.mutation({
-            query:(id)=>({
-                url:`/orders/${id}`,
-                method:"DELETE"
+            updateOrderStatus: builder.mutation({
+                query: ({ orderId, status }) => ({
+                  url: `/orders/${orderId}/status`,
+                  method: 'PATCH',
+                  body: { status }
+                }),
+                invalidatesTags: (result, error, { orderId }) => [
+                  { type: 'Order', id: orderId },
+                  { type: 'Order', id: 'LIST' }
+                ]
+              }),       
+
+            deleteOrder:builder.mutation({
+                query:(id)=>({
+                    url:`/orders/${id}`,
+                    method:"DELETE"
+                }),
+                invalidatesTags:['Order']
             }),
-            invalidatesTags:['Order']
-        }),
 
+        })
     })
-})
 
-export const {
-    useGetAllOrdersQuery,
-    useGetOrderByIdQuery,
-    useCreateOrderMutation,
-    useUpdateOrderStatusMutation,
-    useDeleteOrderMutation,
-  } = orderApi;
+    export const {
+        useGetAllOrdersQuery,
+        useGetOrderByIdQuery,
+        useCreateOrderMutation,
+        useUpdateOrderStatusMutation,
+        useDeleteOrderMutation,
+    } = orderApi;

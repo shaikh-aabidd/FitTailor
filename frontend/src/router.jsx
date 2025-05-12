@@ -15,10 +15,12 @@ import {
   CheckoutPage,
   CustomizationPage,
   OrderTrackingPage,
+  ViewDetailsPage,
 } from './pages';
 import { NotFound, Step1Garment, Step2StyleFabric, Step3Measurements, Step4Tailor, Step5ReviewAddOns } from './components';
 import AdminProductPage from './pages/AdminProductPage';
 import AdminUserRolePage from './pages/AdminUserRolePage';
+import AdminOrderManagementPage from './pages/AdminOrderManagementPage';
 
 export default createBrowserRouter(
   createRoutesFromElements(
@@ -107,6 +109,15 @@ export default createBrowserRouter(
       />
 
       <Route
+        path="order/:id"
+        element={
+          <AuthLayout authentication={true}>
+            <ViewDetailsPage />
+          </AuthLayout>
+        }
+      />
+
+      <Route
         path="/AdminUserRolePage"
         element={
           <AuthLayout authentication={true} roles={"admin"}>
@@ -120,6 +131,15 @@ export default createBrowserRouter(
         element={
           <AuthLayout authentication={true} roles={"admin"}>
             <AdminProductPage />
+          </AuthLayout>
+        }
+      />
+
+      <Route
+        path="/AdminOrderManagement"
+        element={
+          <AuthLayout authentication={true} roles={"admin"}>
+            <AdminOrderManagementPage />
           </AuthLayout>
         }
       />

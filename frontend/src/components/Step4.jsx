@@ -6,7 +6,8 @@ import {
   completeStep,
   setCurrentStep,
 } from '../features/CustomizationSlice';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import Button from './Button';
 
 const Step4Tailor = () => {
   const dispatch = useDispatch();
@@ -49,6 +50,8 @@ const Step4Tailor = () => {
 
   return (
     <div className="space-y-4">
+      <Link to="/customize/step3"><Button className="mb-1"> ← Previous step</Button></Link>
+                  <Link to="/customize"><Button className="mb-3 ml-2"> : Steps Page</Button></Link>
       <div className="flex items-center gap-2">
         <input
           type="checkbox"

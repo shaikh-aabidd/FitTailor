@@ -20,6 +20,7 @@ const Header = () => {
     // Admin-only:
     { name: 'Manage Products', to: '/AdminProductPage', auth: 'auth', adminOnly: true },
     { name: 'Manage Users',    to: '/AdminUserRolePage', auth: 'auth', adminOnly: true },
+    { name: 'Manage Orders',    to: '/AdminOrderManagement', auth: 'auth', adminOnly: true },
     { name: 'Login',   to: '/login',      auth: 'unauth'     },
     { name: 'Signup',  to: '/signup',     auth: 'unauth'     },
   ];

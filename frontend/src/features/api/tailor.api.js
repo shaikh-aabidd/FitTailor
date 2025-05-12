@@ -25,14 +25,18 @@ export const tailorApi = apiSlice.injectEndpoints({
         method: 'PATCH',
         body: updates,
       }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'Tailor', id }],
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'Tailor', id },
+        { type: 'Tailor', id: 'LIST' },
+      ],
     }),
+
     deleteTailor: builder.mutation({
       query: (id) => ({
         url: `/tailors/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['Tailor'],
+      invalidatesTags: [{ type: 'Tailor', id: 'LIST' }],
     }),
   }),
 });

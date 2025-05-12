@@ -1,27 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   useGetCurrentUserQuery
 } from '../features/api/user.api';
 import {
-  useGetMeasurementByIdQuery
+  useGetMeasurementByIdQuery,
+  useAddMeasurementMutation
 } from '../features/api/measurement.api';
 import {
-  setMeasurementData,
   setCurrentStep,
   completeStep,
   setMeasurementProfileId
 } from '../features/CustomizationSlice';
 import MeasurementCard from '../components/MeasurementCard';
 import Loader from '../components/Loader';
+import { toast } from 'react-toastify';
+import Button from './Button';
 
 export default function Step3Measurements() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const authUser = useSelector((state) => state.auth.user);
-  const measurementProfileId = authUser?.measurementProfileId;
+  const customization = useSelector((state) => state.customization);
+  const measurementProfileId = customization?.measurementProfileId;
 
   const {
     data: userResp,
@@ -35,7 +38,10 @@ export default function Step3Measurements() {
     skip: !measurementProfileId
   });
 
+  const [addMeasurement, { isLoading: isSaving }] = useAddMeasurementMutation();
+
   const [selectedProfileId, setSelectedProfileId] = useState(null);
+  const [initialFormData, setInitialFormData] = useState({});
   const [formData, setFormData] = useState({
     height: '',
     chest: '',
@@ -49,13 +55,16 @@ export default function Step3Measurements() {
     if (measurementResp?.data?._id) {
       const data = measurementResp.data;
       setSelectedProfileId(data._id);
-      setFormData({
+      dispatch(setMeasurementProfileId(data._id))
+      const measurements = {
         height: data.height || '',
         chest: data.chest || '',
         waist: data.waist || '',
         sleeve: data.sleeve || '',
         neck: data.neck || ''
-      });
+      };
+      setFormData(measurements);
+      setInitialFormData(measurements);
     }
   }, [measurementResp]);
 
@@ -66,35 +75,67 @@ export default function Step3Measurements() {
         (p) => p._id === selectedProfileId
       );
       if (selected) {
-        setFormData({
+        const measurements = {
           height: selected.height || '',
           chest: selected.chest || '',
           waist: selected.waist || '',
           sleeve: selected.sleeve || '',
           neck: selected.neck || ''
-        });
+        };
+        setFormData(measurements);
+        setInitialFormData(measurements);
       }
     }
   }, [selectedProfileId, userResp]);
 
-  if (userLoading || measurementLoading) return <Loader fullScreen />;
+  if (userLoading || measurementLoading || isSaving) return <Loader fullScreen />;
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleContinue = () => {
-    // Submit updated data
-    dispatch(setMeasurementData({ ...formData, _id: selectedProfileId }));
-    dispatch(setMeasurementProfileId(selectedProfileId));
-    dispatch(completeStep(3));
-    dispatch(setCurrentStep(4));
-    navigate('/customize/step4');
+  // Check if measurements have been modified
+  const isMeasurementModified = () => {
+    return JSON.stringify(formData) !== JSON.stringify(initialFormData);
+  };
+
+  const handleContinue = async () => {
+    try {
+      let finalMeasurementId = selectedProfileId;
+      
+      // If values are modified or no profile is selected, create a new measurement
+      if (isMeasurementModified() || !selectedProfileId) {
+        // Generate a name based on the garment being customized
+        const garmentType = customization.garment +" "+ customization.fabric || 'Garment';
+        const measurementName = `Custom ${garmentType} Measurement`;
+        
+        // Create new measurement
+        const response = await addMeasurement({
+          profileName: measurementName,
+          ...formData
+        }).unwrap();
+        
+        // Use the newly created measurement ID
+        finalMeasurementId = response.data._id;
+        
+        toast.success('New measurement profile created');
+      }
+      
+      // Only set the ID, not the full measurement data
+      dispatch(setMeasurementProfileId(finalMeasurementId));
+      dispatch(completeStep(3));
+      dispatch(setCurrentStep(4));
+      navigate('/customize/step4');
+    } catch (error) {
+      toast.error('Failed to save measurement: ' + (error.data?.message || 'Unknown error'));
+    }
   };
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
+       <Link to="/customize/step2"><Button className="mb-1"> ← Previous step</Button></Link>
+            <Link to="/customize"><Button className="mb-3 ml-2"> : Steps Page</Button></Link>
       <h2 className="text-3xl font-semibold mb-6 text-center">
         Step 3: Select or Update Your Measurements
       </h2>
@@ -146,6 +187,14 @@ export default function Step3Measurements() {
             </div>
           ))}
         </div>
+        
+        {isMeasurementModified() && selectedProfileId && (
+          <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+            <p className="text-sm text-yellow-700">
+              You've modified the selected measurement. A new custom measurement profile will be created.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Navigation */}
@@ -153,14 +202,16 @@ export default function Step3Measurements() {
         <button
           onClick={() => navigate('/customize/step2')}
           className="px-4 py-2 border border-gray-400 rounded hover:bg-gray-100"
+          disabled={isSaving}
         >
           Back
         </button>
         <button
           onClick={handleContinue}
           className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+          disabled={isSaving}
         >
-          Continue to Step 4
+          {isSaving ? 'Saving...' : 'Continue to Step 4'}
         </button>
       </div>
     </div>
